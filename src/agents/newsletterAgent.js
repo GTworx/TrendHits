@@ -21,11 +21,17 @@ export const newsletterAgent = {
     // Generate table rows for Global
     const globalRowsHtml = globalTracks
       .map(
-        (t) => `
+        (t) => {
+          const playerUrl = t.player_url || `https://open.spotify.com/search/${encodeURIComponent(t.artist + ' ' + t.title)}`;
+          return `
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 10px 6px; font-weight: bold; color: #6366f1; width: 28px; text-align: center;">#${t.rank}</td>
           <td style="padding: 10px 8px;">
-            <div style="font-weight: 600; color: #0f172a; font-size: 14px; line-height: 1.3;">${t.title}</div>
+            <div style="font-weight: 600; font-size: 14px; line-height: 1.3;">
+              <a href="${playerUrl}" target="_blank" style="color: #0f172a; text-decoration: none;">
+                ${t.title} <span style="font-size: 11px; color: #6366f1;">▶</span>
+              </a>
+            </div>
             <div style="color: #64748b; font-size: 12px; margin-top: 2px;">${t.artist}</div>
           </td>
           <td style="padding: 10px 6px; text-align: right; width: 50px;">
@@ -34,18 +40,25 @@ export const newsletterAgent = {
             </span>
           </td>
         </tr>
-      `
+      `;
+        }
       )
       .join('');
 
     // Generate table rows for Turkey
     const trRowsHtml = turkeyTracks
       .map(
-        (t) => `
+        (t) => {
+          const playerUrl = t.player_url || `https://open.spotify.com/search/${encodeURIComponent(t.artist + ' ' + t.title)}`;
+          return `
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 10px 6px; font-weight: bold; color: #ef4444; width: 28px; text-align: center;">#${t.rank}</td>
           <td style="padding: 10px 8px;">
-            <div style="font-weight: 600; color: #0f172a; font-size: 14px; line-height: 1.3;">${t.title}</div>
+            <div style="font-weight: 600; font-size: 14px; line-height: 1.3;">
+              <a href="${playerUrl}" target="_blank" style="color: #0f172a; text-decoration: none;">
+                ${t.title} <span style="font-size: 11px; color: #ef4444;">▶</span>
+              </a>
+            </div>
             <div style="color: #64748b; font-size: 12px; margin-top: 2px;">${t.artist}</div>
           </td>
           <td style="padding: 10px 6px; text-align: right; width: 50px;">
@@ -54,7 +67,8 @@ export const newsletterAgent = {
             </span>
           </td>
         </tr>
-      `
+      `;
+        }
       )
       .join('');
 

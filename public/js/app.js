@@ -243,10 +243,68 @@ function renderTracks() {
   attachTrackEvents();
 }
 
+// Helper to extract player metadata and authentic brand styling
+function getPlayerMeta(track) {
+  let playerUrl = track.player_url;
+  const src = (track.source || '').toLowerCase();
+  const q = encodeURIComponent(`${track.artist} ${track.title}`);
+
+  if (!playerUrl) {
+    if (src.startsWith('youtube') || (src.includes('youtube') && !src.includes('spotify'))) {
+      playerUrl = `https://music.youtube.com/search?q=${q}`;
+    } else if (src.startsWith('apple') || (src.includes('apple') && !src.includes('spotify'))) {
+      playerUrl = `https://music.apple.com/search?term=${q}`;
+    } else {
+      playerUrl = `https://open.spotify.com/search/${q}`;
+    }
+  }
+
+  if (playerUrl.includes('youtube.com')) {
+    return {
+      platform: 'YouTube Music',
+      shortName: 'YT Music',
+      url: playerUrl,
+      btnClass: 'hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 text-slate-300',
+      iconSvg: `
+        <svg class="w-3.5 h-3.5 fill-current text-red-500 shrink-0" viewBox="0 0 24 24">
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+      `
+    };
+  }
+
+  if (playerUrl.includes('apple.com')) {
+    return {
+      platform: 'Apple Music',
+      shortName: 'Apple Music',
+      url: playerUrl,
+      btnClass: 'hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-pink-400 text-slate-300',
+      iconSvg: `
+        <svg class="w-3.5 h-3.5 fill-current text-pink-500 shrink-0" viewBox="0 0 24 24">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.07.64-2.73 1.41-.57.66-.99 1.73-.91 2.76 1.06.08 2.06-.55 2.63-1.3"/>
+        </svg>
+      `
+    };
+  }
+
+  return {
+    platform: 'Spotify',
+    shortName: 'Spotify',
+    url: playerUrl,
+    btnClass: 'hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-400 text-slate-300',
+    iconSvg: `
+      <svg class="w-3.5 h-3.5 fill-current text-[#1DB954] shrink-0" viewBox="0 0 24 24">
+        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+      </svg>
+    `
+  };
+}
+
 // Track Row Template (Implements Section 2 of TrendyHits 2.md)
 function renderTrackRow(track) {
   const isLiked = state.likedTracks.has(track.id);
   const isCurrentAudio = musicPlayer.currentTrack && musicPlayer.currentTrack.id === track.id && musicPlayer.isPlaying;
+  const player = getPlayerMeta(track);
 
   // Rank Badge Style
   let rankClass = 'rank-default';
@@ -261,17 +319,17 @@ function renderTrackRow(track) {
   const coverImg = track.image_url || defaultImg;
 
   return `
-    <div class="group relative flex items-center justify-between p-3.5 rounded-xl border border-slate-800/80 bg-slate-900/60 hover:bg-slate-800/70 hover:border-slate-700 transition-all duration-200">
+    <div class="group relative flex items-center justify-between p-3 sm:p-3.5 rounded-xl border border-slate-800/80 bg-slate-900/60 hover:bg-slate-800/70 hover:border-slate-700 transition-all duration-200">
       
       <!-- Left: Rank + Cover + Info -->
-      <div class="flex items-center gap-3.5 min-w-0 pr-2">
+      <div class="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-2">
         <!-- Rank -->
         <span class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${rankClass}">
           #${track.rank}
         </span>
 
         <!-- Cover & Play Overlay -->
-        <div class="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-800 group/art cursor-pointer play-track-btn" data-id="${track.id}">
+        <div class="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-800 group/art cursor-pointer play-track-btn" data-id="${track.id}" title="Önizleme Dinle">
           <img src="${coverImg}" alt="${track.title}" class="w-full h-full object-cover group-hover/art:scale-105 transition duration-300" loading="lazy" />
           <div class="absolute inset-0 bg-black/40 flex items-center justify-center ${isCurrentAudio ? 'opacity-100 bg-black/60' : 'opacity-0 group-hover/art:opacity-100'} transition">
             ${isCurrentAudio ? `
@@ -291,9 +349,18 @@ function renderTrackRow(track) {
 
         <!-- Title & Artist -->
         <div class="min-w-0">
-          <p class="font-semibold text-slate-100 text-sm truncate group-hover:text-indigo-400 transition" title="${track.title}">
-            ${track.title}
-          </p>
+          <a 
+            href="${player.url}" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="font-semibold text-slate-100 text-sm truncate group-hover:text-indigo-400 hover:underline inline-flex items-center gap-1.5" 
+            title="${track.title} (${player.platform}'da Aç)"
+          >
+            <span class="truncate">${track.title}</span>
+            <svg class="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-75 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </a>
           <p class="text-xs text-slate-400 truncate mt-0.5" title="${track.artist}">
             ${track.artist}
           </p>
@@ -308,19 +375,39 @@ function renderTrackRow(track) {
         </div>
       </div>
 
-      <!-- Right: Like Button (Heart & Counter) -->
-      <button 
-        data-id="${track.id}"
-        class="like-btn shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${isLiked ? 'border-red-500/60 bg-red-500/10 text-red-400' : 'border-slate-700/80 bg-slate-800/50 text-slate-400 hover:text-red-400 hover:border-red-500/30'}"
-        title="Beğen"
-      >
-        <svg class="w-4 h-4 fill-current ${isLiked ? 'text-red-500 animate-heart' : ''}" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span class="text-xs font-semibold track-likes-count">
-          ${track.likes_count || 0}
-        </span>
-      </button>
+      <!-- Right: Action Buttons (Real Player Link + Like Button) -->
+      <div class="flex items-center gap-2 shrink-0">
+        
+        <!-- Direct Source Player Link Button -->
+        <a 
+          href="${player.url}" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-slate-700/80 bg-slate-800/60 ${player.btnClass} transition"
+          title="${player.platform}'da Dinle"
+        >
+          ${player.iconSvg}
+          <span class="hidden md:inline text-[11px] font-medium">${player.shortName}</span>
+          <svg class="w-3 h-3 text-slate-400 -mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </a>
+
+        <!-- Like Button (Heart & Counter) -->
+        <button 
+          data-id="${track.id}"
+          class="like-btn shrink-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border ${isLiked ? 'border-red-500/60 bg-red-500/10 text-red-400' : 'border-slate-700/80 bg-slate-800/50 text-slate-400 hover:text-red-400 hover:border-red-500/30'} transition"
+          title="Beğen"
+        >
+          <svg class="w-4 h-4 fill-current ${isLiked ? 'text-red-500 animate-heart' : ''}" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          <span class="text-xs font-semibold track-likes-count">
+            ${track.likes_count || 0}
+          </span>
+        </button>
+
+      </div>
 
     </div>
   `;
@@ -411,12 +498,20 @@ function setupPlayerListener() {
     const playerArtist = document.getElementById('player-track-artist');
     const playerCover = document.getElementById('player-track-cover');
     const playerPlayIcon = document.getElementById('player-play-icon');
+    const playerLink = document.getElementById('player-external-link');
 
     if (track && playerBar) {
       playerBar.classList.remove('hidden');
       if (playerTitle) playerTitle.textContent = track.title;
       if (playerArtist) playerArtist.textContent = track.artist;
       if (playerCover && track.image_url) playerCover.src = track.image_url;
+
+      if (playerLink) {
+        const meta = getPlayerMeta(track);
+        playerLink.href = meta.url;
+        playerLink.title = `${meta.platform}'da Orijinal Parçayı Dinle`;
+        playerLink.classList.remove('hidden');
+      }
 
       if (playerPlayIcon) {
         playerPlayIcon.innerHTML = isPlaying
@@ -425,6 +520,7 @@ function setupPlayerListener() {
       }
     } else if (playerBar) {
       playerBar.classList.add('hidden');
+      if (playerLink) playerLink.classList.add('hidden');
     }
 
     renderTracks();

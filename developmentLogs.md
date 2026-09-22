@@ -4,6 +4,19 @@ Tüm geliştirme aşamaları, mimari kararlar, arayüz güncellemeleri ve dağı
 
 ---
 
+## [2026-09-22] - Doğrudan Kaynak Oynatıcı Bağlantıları (Spotify, YouTube Music, Apple Music)
+
+### 1. Parçalara Kaynak Oynatıcı Linkleri Eklendi
+- **Dosyalar:** [`public/js/app.js`](./public/js/app.js), [`public/index.html`](./public/index.html), [`public/data/initialTrends.json`](./public/data/initialTrends.json), [`src/db/seedData.js`](./src/db/seedData.js), [`src/db/database.js`](./src/db/database.js), [`src/agents/validatorAgent.js`](./src/agents/validatorAgent.js), [`src/agents/newsletterAgent.js`](./src/agents/newsletterAgent.js)
+- **Özellikler:**
+  - **Arayüzde Oynatıcı Butonları:** Her şarkı kartının sağ tarafına ve şarkı başlığına ilgili kaynağın (Spotify, YouTube Music veya Apple Music) özgün marka ikonunu ve renklerini içeren doğrudan dinleme bağlantısı (`player_url`) eklendi.
+  - **Kayan Oynatıcı Çubuğu Entegrasyonu:** Alt kısımda açılan floating player çubuğuna, o an çalan parçayı orijinal platformunda tam versiyonuyla açan dinamik bağlantı butonu eklendi.
+  - **Veritabanı Şeması & Geriye Dönük Doldurma (Backfill):** SQLite `tracks` tablosuna `player_url TEXT` sütunu eklendi; var olan kayıtlar ve yeni eklenen tüm parçalar kaynaklarına göre otomatik olarak Spotify, YouTube Music veya Apple Music oynatıcı linkleriyle dolduruldu.
+  - **Validator Ajan Desteği:** Çoklu ajan sistemi her yeni liste taramasında, bulunan parçanın kaynağına göre `player_url` alanını otomatik üretecek şekilde güncellendi.
+  - **E-Posta Bülteni Entegrasyonu:** Brevo üzerinden gönderilen HTML e-posta bültenindeki şarkı başlıkları, kullanıcıların doğrudan tıklayıp parçayı dinleyebileceği interaktif bağlantılara dönüştürüldü.
+
+---
+
 ## [2026-09-22] - Hata Düzeltmesi: Netlify İstek Hatası ve Güvenli API/Demo Modu Desteği
 
 ### 1. Ekran Görüntüsü İncelemesi (`errorLogs/refresh-error.png`)

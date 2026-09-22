@@ -55,17 +55,21 @@ export const validatorAgent = {
       }
       seen.add(key);
 
+      const source = item.source || (region === 'GLOBAL' ? 'Spotify Global / Billboard' : 'Spotify TR / YouTube TR');
+      const playerUrl = item.player_url || this.generatePlayerUrl(normalizedTitle, normalizedArtist, source);
+
       result.push({
         id: item.id || `${region.toLowerCase()}-${result.length + 1}`,
         rank: result.length + 1,
         title: normalizedTitle,
         artist: normalizedArtist,
         region: region,
-        source: item.source || (region === 'GLOBAL' ? 'Spotify Global / Billboard' : 'Spotify TR / YouTube TR'),
+        source: source,
         genre: item.genre || (region === 'GLOBAL' ? 'Pop' : 'Türkçe Pop'),
         likes_count: item.likes_count || 0,
         preview_url: item.preview_url || '',
-        image_url: item.image_url || ''
+        image_url: item.image_url || '',
+        player_url: playerUrl
       });
     }
 
@@ -89,5 +93,17 @@ export const validatorAgent = {
       .replace(/\s+/g, ' ')
       .replace(/\s*,\s*/g, ' & ')
       .trim();
+  },
+
+  generatePlayerUrl(title, artist, source = '') {
+    const q = encodeURIComponent(`${artist} ${title}`);
+    const s = (source || '').toLowerCase();
+    if (s.startsWith('youtube') || (s.includes('youtube') && !s.includes('spotify'))) {
+      return `https://music.youtube.com/search?q=${q}`;
+    }
+    if (s.startsWith('apple') || (s.includes('apple') && !s.includes('spotify'))) {
+      return `https://music.apple.com/search?term=${q}`;
+    }
+    return `https://open.spotify.com/search/${q}`;
   }
 };

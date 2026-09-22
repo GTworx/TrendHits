@@ -35,9 +35,42 @@ function initSchema(db) {
       likes_count INT DEFAULT 0,
       preview_url TEXT,
       image_url TEXT,
+      player_url TEXT,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  try {
+    db.exec(`ALTER TABLE tracks ADD COLUMN player_url TEXT`);
+  } catch {
+    // Column already exists
+  }
+
+  // Backfill player_url for existing tracks if missing
+  try {
+    const missingUrls = db.prepare("SELECT id, title, artist, source FROM tracks WHERE player_url IS NULL OR player_url = ''").all();
+    if (missingUrls.length > 0) {
+      const updateUrlStmt = db.prepare('UPDATE tracks SET player_url = ? WHERE id = ?');
+      for (const row of missingUrls) {
+        const match = initialTracks.find((t) => t.id === row.id);
+        let url = match && match.player_url ? match.player_url : null;
+        if (!url) {
+          const q = encodeURIComponent(`${row.artist} ${row.title}`);
+          const s = (row.source || '').toLowerCase();
+          if (s.startsWith('youtube') || (s.includes('youtube') && !s.includes('spotify'))) {
+            url = `https://music.youtube.com/search?q=${q}`;
+          } else if (s.startsWith('apple') || (s.includes('apple') && !s.includes('spotify'))) {
+            url = `https://music.apple.com/search?term=${q}`;
+          } else {
+            url = `https://open.spotify.com/search/${q}`;
+          }
+        }
+        updateUrlStmt.run(url, row.id);
+      }
+    }
+  } catch (err) {
+    logger.warn('System', `Failed to backfill player_url: ${err.message}`);
+  }
 
   // 2. Newsletter subscribers table (Brevo integration)
   db.exec(`
@@ -89,8 +122,8 @@ function initSchema(db) {
   if (countRow.count === 0) {
     logger.info('System', 'Seeding database with initial Global and TR music trends...');
     const insertStmt = db.prepare(`
-      INSERT INTO tracks (id, rank, title, artist, region, source, genre, likes_count, preview_url, image_url, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      INSERT INTO tracks (id, rank, title, artist, region, source, genre, likes_count, preview_url, image_url, player_url, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `);
 
     for (const track of initialTracks) {
@@ -104,7 +137,8 @@ function initSchema(db) {
         track.genre || 'Pop',
         track.likes_count || 0,
         track.preview_url || '',
-        track.image_url || ''
+        track.image_url || '',
+        track.player_url || ''
       );
     }
     logger.success('System', `Seeded ${initialTracks.length} tracks successfully into SQLite.`);
@@ -141,8 +175,8 @@ export const dbService = {
     const likes = existing ? existing.likes_count : (track.likes_count || 0);
 
     const stmt = db.prepare(`
-      INSERT INTO tracks (id, rank, title, artist, region, source, genre, likes_count, preview_url, image_url, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      INSERT INTO tracks (id, rank, title, artist, region, source, genre, likes_count, preview_url, image_url, player_url, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
       ON CONFLICT(id) DO UPDATE SET
         rank = excluded.rank,
         title = excluded.title,
@@ -152,6 +186,7 @@ export const dbService = {
         genre = excluded.genre,
         preview_url = CASE WHEN excluded.preview_url != '' THEN excluded.preview_url ELSE tracks.preview_url END,
         image_url = CASE WHEN excluded.image_url != '' THEN excluded.image_url ELSE tracks.image_url END,
+        player_url = CASE WHEN excluded.player_url != '' THEN excluded.player_url ELSE tracks.player_url END,
         updated_at = CURRENT_TIMESTAMP
     `);
 
@@ -165,7 +200,8 @@ export const dbService = {
       track.genre || '',
       likes,
       track.preview_url || '',
-      track.image_url || ''
+      track.image_url || '',
+      track.player_url || ''
     );
   },
 
