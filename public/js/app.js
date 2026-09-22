@@ -328,24 +328,21 @@ function renderTrackRow(track) {
           #${track.rank}
         </span>
 
-        <!-- Cover & Play Overlay -->
-        <div class="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-800 group/art cursor-pointer play-track-btn" data-id="${track.id}" title="Önizleme Dinle">
-          <img src="${coverImg}" alt="${track.title}" class="w-full h-full object-cover group-hover/art:scale-105 transition duration-300" loading="lazy" />
-          <div class="absolute inset-0 bg-black/40 flex items-center justify-center ${isCurrentAudio ? 'opacity-100 bg-black/60' : 'opacity-0 group-hover/art:opacity-100'} transition">
-            ${isCurrentAudio ? `
-              <div class="flex items-end gap-0.5 h-4">
-                <span class="wave-bar"></span>
-                <span class="wave-bar"></span>
-                <span class="wave-bar"></span>
-                <span class="wave-bar"></span>
-              </div>
-            ` : `
-              <svg class="w-5 h-5 text-white fill-current ml-0.5" viewBox="0 0 24 24">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-            `}
+        <!-- Cover & Source Player Link -->
+        <a 
+          href="${player.url}" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-800 group/art block cursor-pointer border border-slate-700/50 hover:border-indigo-500/60 transition" 
+          title="${track.title} (${player.platform}'da Dinle)"
+        >
+          <img src="${coverImg}" alt="${track.title}" class="w-full h-full object-cover group-hover/art:scale-110 transition duration-300" loading="lazy" />
+          
+          <!-- Hover Overlay with Platform Badge -->
+          <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/art:opacity-100 transition duration-200">
+            ${player.iconSvg}
           </div>
-        </div>
+        </a>
 
         <!-- Title & Artist -->
         <div class="min-w-0">
@@ -371,6 +368,24 @@ function renderTrackRow(track) {
             <span class="text-[10px] text-slate-500 hidden sm:inline-block">
               ${track.source ? track.source.split('/')[0].trim() : ''}
             </span>
+            ${track.preview_url ? `
+              <button 
+                class="play-track-btn text-[10px] text-indigo-400 hover:text-indigo-300 bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-800/40 px-1.5 py-0.5 rounded flex items-center gap-1 transition"
+                data-id="${track.id}"
+                title="30s Önizleme Dinle"
+              >
+                ${isCurrentAudio ? `
+                  <span class="flex items-end gap-0.5 h-2.5">
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                  </span>
+                  <span>Çalıyor</span>
+                ` : `
+                  <span>▶</span>
+                  <span>Önizle</span>
+                `}
+              </button>
+            ` : ''}
           </div>
         </div>
       </div>
@@ -497,6 +512,7 @@ function setupPlayerListener() {
     const playerTitle = document.getElementById('player-track-title');
     const playerArtist = document.getElementById('player-track-artist');
     const playerCover = document.getElementById('player-track-cover');
+    const playerCoverLink = document.getElementById('player-track-cover-link');
     const playerPlayIcon = document.getElementById('player-play-icon');
     const playerLink = document.getElementById('player-external-link');
 
@@ -506,8 +522,14 @@ function setupPlayerListener() {
       if (playerArtist) playerArtist.textContent = track.artist;
       if (playerCover && track.image_url) playerCover.src = track.image_url;
 
+      const meta = getPlayerMeta(track);
+
+      if (playerCoverLink) {
+        playerCoverLink.href = meta.url;
+        playerCoverLink.title = `${meta.platform}'da Orijinal Parçayı Dinle`;
+      }
+
       if (playerLink) {
-        const meta = getPlayerMeta(track);
         playerLink.href = meta.url;
         playerLink.title = `${meta.platform}'da Orijinal Parçayı Dinle`;
         playerLink.classList.remove('hidden');
