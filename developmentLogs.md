@@ -4,6 +4,28 @@ Tüm geliştirme aşamaları, mimari kararlar, arayüz güncellemeleri ve dağı
 
 ---
 
+## [2026-09-22] - Hata Düzeltmesi: Netlify İstek Hatası ve Güvenli API/Demo Modu Desteği
+
+### 1. Ekran Görüntüsü İncelemesi (`errorLogs/refresh-error.png`)
+- **Tespit Edilen Hata:** `Ajan çalıştırma hatası: Failed to execute 'json' on 'Response': Unexpected end of JSON input`
+- **Kök Neden:** 
+  - Netlify yalnızca statik dosyaları barındırdığı için `POST /api/agents/run` isteğini yakalayıp Netlify Forms mekanizması gereği `HTTP 400 Bad Request ("Bad request, missing form")` veya `404` düz metin yanıtı dönüyordu.
+  - İstemci tarafında `res.json()` bu düz metni ayrıştırmaya çalıştığında raw JSON parser hatası oluşuyordu.
+
+### 2. İstemci Tarafı İyileştirmeleri & Güvenli Yanıt Denetimi
+- **Dosyalar:** [`public/js/api.js`](./public/js/api.js), [`public/js/app.js`](./public/js/app.js), [`public/data/initialTrends.json`](./public/data/initialTrends.json)
+- **`safeFetch` Fonksiyonu:**
+  - Tüm API çağrılarında HTTP durum kodları, `content-type: application/json` ve Netlify 400/404 yanıtları tespit edilerek kullanıcıya anlaşılır Türkçe hata mesajları (`Backend API bulunamadı (HTTP 400). Statik barındırmada (Netlify) Node.js sunucusu çalışmıyor veya proxy yönlendirmesi yapılmamış.`) iletilmesi sağlandı.
+  - Ham JavaScript `Unexpected end of JSON input` hatası engellendi.
+- **Statik Demo Veri Desteği (`public/data/initialTrends.json`):**
+  - Netlify üzerinde veya backend çevrimdışıyken arayüzün boş kalmaması için `initialTrends.json` veri seti oluşturuldu.
+  - `api.getTrends()` backend'e ulaşamadığında otomatik olarak bu veri setini yükler ve kullanıcıyı bilgilendirir (`Demo Modu: Statik trend verileri yüklendi`).
+  - Beğeni (like) etkileşimleri backend çevrimdışıyken de arayüzde simüle edilerek sayfa deneyiminin bozulmaması sağlandı.
+- **SSE Bağlantı İyileştirmesi:**
+  - Backend çevrimdışıyken EventSource'un sonsuz döngüde hata vermesi engellendi (azami 2 deneme sonrası sessiz duraklatma).
+
+---
+
 ## [2026-09-22] - Başlık Güncellemesi ve Netlify Dağıtım Yapılandırması
 
 ### 1. Arayüz Başlık Güncellemesi

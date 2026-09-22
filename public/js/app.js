@@ -48,6 +48,9 @@ async function loadTrends() {
       state.turkeyTracks = data.turkey_trends || [];
       state.stats = data.stats || {};
       renderAll();
+      if (data.is_demo) {
+        showToast('Demo Modu: Statik trend verileri yüklendi (Backend çevrimdışı).', 'info');
+      }
     }
   } catch (err) {
     console.error('Trend verisi yüklenirken hata:', err);
@@ -447,7 +450,7 @@ async function handleRunAgents() {
       showToast('✓ Tüm listeler ve veritabanı güncellendi!', 'success');
     }
   } catch (err) {
-    showToast('Ajan çalıştırma hatası: ' + err.message, 'error');
+    showToast(err.message, 'error');
   } finally {
     state.isAgentRunning = false;
     updateRunAgentButton();
