@@ -1,5 +1,12 @@
 [build]
   publish = "public"
+  functions = "netlify/functions"
+
+# Route /api/subscribe to Netlify serverless function
+[[redirects]]
+  from = "/api/subscribe"
+  to = "/.netlify/functions/subscribe"
+  status = 200
 
 # If your backend is hosted separately (e.g. Render, Railway), uncomment and set your backend URL:
 # [[redirects]]

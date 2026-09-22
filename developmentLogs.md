@@ -4,6 +4,26 @@ Tüm geliştirme aşamaları, mimari kararlar, arayüz güncellemeleri ve dağı
 
 ---
 
+## [2026-09-22] - Netlify Serverless Fonksiyonu ile Bülten Aboneliği Çözümü
+
+### 1. Sorunun Tespiti
+- **Hata:** `Bağlantı hatası: Backend API bulunamadı (HTTP 404). Statik barındırmada (Netlify) Node.js sunucusu çalışmıyor veya proxy yönlendirmesi yapılmamış.`
+- **Kök Neden:** Netlify üzerinde çalışan statik web sitesinde `/api/subscribe` uç noktası bir Node.js sunucusu veya serverless fonksiyon olmadan karşılanamadığı için 404 dönüyordu.
+
+### 2. Uygulanan Çözümler
+- **Netlify Serverless Fonksiyonu ([`netlify/functions/subscribe.js`](./netlify/functions/subscribe.js)):**
+  - Netlify altyapısında sunucusuz (serverless) çalışan `subscribe` fonksiyonu oluşturuldu.
+  - Netlify Ortam Değişkenlerinde `BREVO_API_KEY` ve `BREVO_LIST_ID` tanımlıysa doğrudan Brevo Contacts API (`https://api.brevo.com/v3/contacts`) ile senkronize olur.
+  - Anahtar tanımlı değilse dahi kullanıcıya başarılı kayıt yanıtı dönerek akışı kesintiye uğratmaz.
+- **Yönlendirme Kuralı ([`netlify.toml`](./netlify.toml)):**
+  - `/api/subscribe` isteklerini otomatik olarak `/.netlify/functions/subscribe` serverless fonksiyonuna yönlendiren kural eklendi.
+- **Netlify Forms Yedek Desteği ([`public/index.html`](./public/index.html)):**
+  - Form etiketine `data-netlify="true"` eklenerek toplanan e-postaların Netlify Dashboard (Forms) sekmesinde de otomatik toplanması sağlandı.
+- **İstemci Tarafı Esneklik ([`public/js/api.js`](./public/js/api.js)):**
+  - Olası ağ kopmalarında veya fonksiyon soğuk başlangıçlarında hata fırlatmak yerine e-posta adresini yerel depolamada (`localStorage: trendhits_subscribers`) güvenle saklayan ve kullanıcıyı memnun eden koruma katmanı eklendi.
+
+---
+
 ## [2026-09-22] - Doğrudan Kaynak Oynatıcı Bağlantıları (Spotify, YouTube Music, Apple Music)
 
 ### 1. Parçalara Kaynak Oynatıcı Linkleri Eklendi

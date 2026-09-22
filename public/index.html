@@ -304,10 +304,18 @@
           Dünyada ve Türkiye'de listeleri altüst eden hit parçalar, viral yükselişler ve topluluğun en çok oy verdiği parçalar doğrudan gelen kutunuzda.
         </p>
 
-        <!-- Subscription Form -->
-        <form id="subscribe-form" class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-md mx-auto">
+        <!-- Subscription Form (Integrated with Netlify Forms & Serverless Functions) -->
+        <form 
+          id="subscribe-form" 
+          name="newsletter" 
+          method="POST" 
+          data-netlify="true" 
+          class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-md mx-auto"
+        >
+          <input type="hidden" name="form-name" value="newsletter" />
           <input 
             type="email" 
+            name="email"
             id="subscribe-email-input" 
             required 
             placeholder="E-posta adresinizi giriniz..."
