@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrendHits • Agentic AI Music Intelligence Dashboard</title>
+  <meta name="description" content="Çoklu yapay zeka ajanları ile anlık Global ve Türkiye müzik trendleri ve bülten otomasyonu">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-[#0b0f19]/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-indigo-300">
+              TrendHits
+            </span>
+            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 uppercase tracking-wider">
+              Agentic AI
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 -mt-0.5 hidden sm:block">Müzik İstihbarat & Bülten Paneli</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        
+        <!-- Run AI Agents Button -->
+        <button 
+          id="run-agents-btn"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-xs sm:text-sm shadow-md shadow-indigo-600/30 transition active:scale-95"
+        >
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          <span class="hidden sm:inline">Ajanları Çalıştır</span>
+          <span class="sm:hidden">Yenile</span>
+        </button>
+
+        <!-- Newsletter Studio Trigger -->
+        <button 
+          id="open-newsletter-btn"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-medium text-xs sm:text-sm transition"
+          title="Bülten Hazırla ve Gönder (Brevo)"
+        >
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          <span class="hidden md:inline">Bülten Stüdyosu</span>
+        </button>
+
+        <!-- Live Terminal Trigger -->
+        <button 
+          id="toggle-terminal-btn"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-medium text-xs sm:text-sm transition"
+          title="Ajan Loglarını Görüntüle"
+        >
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span class="hidden lg:inline">Terminal</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button 
+          id="open-settings-btn"
+          class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700 transition"
+          title="Ayarlar & API Anahtarları"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Hero / Agentic Architecture Status Bar -->
+    <div class="glass-panel rounded-2xl p-5 sm:p-6 border border-slate-800">
+      
+      <!-- Top info -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Çoklu Ajan Sistemi Aktif</span>
+            <span class="text-slate-600">•</span>
+            <span class="text-xs text-slate-400">Son Güncelleme: <span id="stat-last-updated" class="font-mono text-slate-300">--:--</span></span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-bold text-white mt-1">
+            Müzik İstihbarat & Otomatik Bülten Orkestrasyonu
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            Billboard, Spotify ve Apple Music listelerini eşzamanlı tarayan otonom ajanlar; verileri doğrular, ikili sütun olarak sunar ve Brevo üzerinden bülten olarak dağıtır.
+          </p>
+        </div>
+
+        <!-- Metric Badges -->
+        <div class="grid grid-cols-3 gap-3 shrink-0">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-center">
+            <span class="text-slate-400 text-[11px] block">İndekslenen Hit</span>
+            <span id="stat-total-tracks" class="text-lg font-bold text-indigo-400 font-mono">50</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-center">
+            <span class="text-slate-400 text-[11px] block">Toplam Beğeni</span>
+            <span id="stat-total-likes" class="text-lg font-bold text-rose-400 font-mono">0</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-center">
+            <span class="text-slate-400 text-[11px] block">Bülten Abonesi</span>
+            <span id="stat-subscribers" class="text-lg font-bold text-emerald-400 font-mono">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Flow Pill Pipeline -->
+      <div class="pt-4 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-slate-400 text-[11px] font-medium mr-1">Ajan Pipeline:</span>
+        
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-950/40 border border-purple-800/40 text-purple-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+          <span>Orchestrator</span>
+        </div>
+        <span class="text-slate-600">→</span>
+
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-950/40 border border-blue-800/40 text-blue-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+          <span>Global Trend Agent</span>
+        </div>
+        <span class="text-slate-600 font-bold">&</span>
+
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 border border-red-800/40 text-red-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+          <span>TR Trend Agent</span>
+        </div>
+        <span class="text-slate-600">→</span>
+
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/40 border border-amber-800/40 text-amber-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          <span>Validator & Deduplicator</span>
+        </div>
+        <span class="text-slate-600">→</span>
+
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Brevo Newsletter Agent</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Şarkıcı, parça adı veya tür ara (ör: Sabrina, Motive, Pop, Trap)..."
+          class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+        />
+      </div>
+
+      <!-- Sorting Selector -->
+      <div class="flex items-center gap-2 shrink-0">
+        <label for="sort-select" class="text-xs text-slate-400 font-medium shrink-0">Sırala:</label>
+        <select 
+          id="sort-select" 
+          class="bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+        >
+          <option value="rank">Liste Sıralaması (1 - 25)</option>
+          <option value="likes">Topluluk Beğenisi (En Çok Like)</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- SIDE-BY-SIDE TWO-COLUMN MUSIC TRENDS GRID -->
+    <!-- (Implements Section 1 of TrendyHits 1.md and Section 2 of TrendyHits 2.md) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- LEFT COLUMN: GLOBAL TRENDS (Dünya) -->
+      <div class="glass-panel rounded-2xl border border-slate-800 flex flex-col overflow-hidden">
+        
+        <!-- Column Header -->
+        <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-lg">
+              🌍
+            </span>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                Global Trendler (Dünya)
+              </h2>
+              <p class="text-xs text-slate-400">Billboard Hot 100 • Spotify Global • Apple Music</p>
+            </div>
+          </div>
+          <span class="text-xs font-semibold px-2 py-1 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-800/40">
+            Top 25
+          </span>
+        </div>
+
+        <!-- Column Body Track List -->
+        <div id="global-tracks-container" class="p-3 sm:p-4 space-y-2.5 flex-1 max-h-[820px] overflow-y-auto">
+          <!-- Rendered dynamically -->
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: TÜRKİYE TRENDLERİ -->
+      <div class="glass-panel rounded-2xl border border-slate-800 flex flex-col overflow-hidden">
+        
+        <!-- Column Header -->
+        <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-lg">
+              🇹🇷
+            </span>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                Türkiye Trendleri
+              </h2>
+              <p class="text-xs text-slate-400">Spotify TR Top 50 • YouTube Music TR • Apple Music</p>
+            </div>
+          </div>
+          <span class="text-xs font-semibold px-2 py-1 rounded bg-red-950/60 text-red-300 border border-red-800/40">
+            Top 25
+          </span>
+        </div>
+
+        <!-- Column Body Track List -->
+        <div id="turkey-tracks-container" class="p-3 sm:p-4 space-y-2.5 flex-1 max-h-[820px] overflow-y-auto">
+          <!-- Rendered dynamically -->
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BOTTOM SECTION: BREVO NEWSLETTER SUBSCRIPTION CARD -->
+    <!-- (Implements Section 3 of TrendyHits 2.md) -->
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950/80 via-slate-900 to-purple-950/80 border border-indigo-800/40 p-6 sm:p-8">
+      
+      <!-- Decorative background blur -->
+      <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-2xl mx-auto text-center space-y-4">
+        
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold">
+          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          Haftalık Müzik Trend Bülteni
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+          Trend Müzikleri Her Hafta E-posta ile Alın 🎧
+        </h2>
+
+        <p class="text-sm text-slate-300 leading-relaxed max-w-xl mx-auto">
+          Dünyada ve Türkiye'de listeleri altüst eden hit parçalar, viral yükselişler ve topluluğun en çok oy verdiği parçalar doğrudan gelen kutunuzda.
+        </p>
+
+        <!-- Subscription Form -->
+        <form id="subscribe-form" class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-md mx-auto">
+          <input 
+            type="email" 
+            id="subscribe-email-input" 
+            required 
+            placeholder="E-posta adresinizi giriniz..."
+            class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+          />
+          <button 
+            type="submit" 
+            id="subscribe-submit-btn"
+            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition active:scale-95 shrink-0"
+          >
+            Abone Ol
+          </button>
+        </form>
+
+        <p id="subscribe-message" class="text-xs font-medium hidden mt-2"></p>
+
+        <p class="text-[11px] text-slate-400 pt-1">
+          🔒 Brevo (Sendinblue) API altyapısı ile güvenli abonelik. İstediğiniz an tek tıkla ayrılabilirsiniz.
+        </p>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Floating Audio Player Bar (Plays previews when user clicks cover art) -->
+  <div id="floating-player-bar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-md glass-panel rounded-2xl p-3 border border-indigo-500/30 shadow-2xl shadow-indigo-950/50 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <img id="player-track-cover" src="" alt="Track Art" class="w-10 h-10 rounded-lg object-cover bg-slate-800 shrink-0" />
+      <div class="min-w-0">
+        <p id="player-track-title" class="text-xs font-semibold text-white truncate"></p>
+        <p id="player-track-artist" class="text-[11px] text-slate-400 truncate"></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="flex items-end gap-0.5 h-4 mr-2">
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+      </span>
+      <button id="player-play-icon" class="p-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition"></button>
+      <button id="stop-audio-btn" class="p-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition" title="Durdur">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Real-Time Agent Activity Terminal Drawer -->
+  <div 
+    id="agent-terminal-drawer"
+    class="fixed bottom-0 left-0 right-0 z-50 transform translate-y-full transition-transform duration-300 ease-in-out bg-slate-950/95 border-t border-slate-800 terminal-glow backdrop-blur-xl max-h-96 flex flex-col"
+  >
+    <!-- Terminal Header -->
+    <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+      <div class="flex items-center gap-2">
+        <div class="flex gap-1.5 mr-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+        </div>
+        <span class="font-mono text-xs font-bold text-slate-300 flex items-center gap-2">
+          ⚡ Multi-Agent Real-Time Intelligence Stream (SSE)
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="clear-terminal-btn" class="px-2 py-1 text-[11px] rounded bg-slate-800 hover:bg-slate-700 text-slate-400 font-mono transition">
+          Temizle
+        </button>
+        <button id="close-terminal-btn" class="p-1 rounded text-slate-400 hover:text-white transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Terminal Output Area -->
+    <div id="terminal-logs-container" class="p-3 overflow-y-auto flex-1 font-mono text-xs space-y-1">
+      <div class="text-xs text-slate-500 py-1">Ajan akışı dinleniyor... 'Ajanları Çalıştır' butonuna basarak tetikleyebilirsiniz.</div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER STUDIO MODAL -->
+  <div id="newsletter-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Newsletter Dispatcher Agent Studio</h3>
+            <p class="text-xs text-slate-400">HTML E-Posta Şablon Önizleme ve Brevo API Gönderimi</p>
+          </div>
+        </div>
+        <button id="close-newsletter-modal" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (Preview + Controls) -->
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 overflow-y-auto">
+        
+        <!-- Live HTML Preview (2 cols) -->
+        <div class="lg:col-span-2 flex flex-col bg-slate-950 rounded-xl border border-slate-800 overflow-hidden h-[480px]">
+          <div class="px-3 py-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span>Canlı HTML Önizleme</span>
+            <a href="/api/newsletter/preview" target="_blank" class="text-indigo-400 hover:underline">Yeni Sekmede Aç ↗</a>
+          </div>
+          <iframe id="newsletter-preview-frame" class="w-full flex-1 border-0 bg-slate-900"></iframe>
+        </div>
+
+        <!-- Dispatch Controls & History -->
+        <div class="space-y-4 flex flex-col">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Gönderim Parametreleri</h4>
+            
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">E-Posta Konusu</label>
+              <input 
+                type="text" 
+                id="newsletter-subject-input" 
+                value="🎧 Haftanın Hit Parçaları: Global & Türkiye Trendleri" 
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Hedef Test E-postası (Opsiyonel)</label>
+              <input 
+                type="email" 
+                id="newsletter-target-email" 
+                placeholder="Boş bırakılırsa tüm abonelere gider" 
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <button 
+              id="dispatch-newsletter-btn" 
+              class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-lg shadow-emerald-600/20 active:scale-95"
+            >
+              Bülteni Gönder (Brevo)
+            </button>
+          </div>
+
+          <!-- History -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex-1 flex flex-col">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Son Gönderim Geçmişi</h4>
+            <div id="newsletter-history-list" class="space-y-1.5 flex-1 overflow-y-auto max-h-48">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-5 sm:p-6 space-y-4 shadow-2xl">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>⚙️</span> Sistem Ayarları & API Anahtarları
+        </h3>
+        <button id="close-settings-modal" class="p-1 rounded-lg text-slate-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="settings-form" class="space-y-4 text-xs">
+        
+        <!-- Brevo Settings -->
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+          <span class="font-bold text-indigo-400 block text-[11px] uppercase tracking-wider">Brevo (Sendinblue) API Entegrasyonu</span>
+          
+          <div>
+            <label class="block text-slate-400 mb-1">Brevo API Key (xkeysib-...)</label>
+            <input 
+              type="password" 
+              id="setting-brevo-key" 
+              placeholder="Boş bırakılırsa simüle modda çalışır" 
+              class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-slate-400 mb-1">Liste ID (List ID)</label>
+              <input 
+                type="number" 
+                id="setting-brevo-list-id" 
+                value="2" 
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Gönderici İsmi</label>
+              <input 
+                type="text" 
+                id="setting-brevo-name" 
+                value="TrendHits Music Intelligence" 
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 mb-1">Gönderici E-posta</label>
+            <input 
+              type="email" 
+              id="setting-brevo-email" 
+              value="newsletter@trendhits.com" 
+              class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+        </div>
+
+        <!-- Gemini AI Settings -->
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+          <span class="font-bold text-purple-400 block text-[11px] uppercase tracking-wider">Google Gemini AI / LLM Entegrasyonu</span>
+          
+          <div>
+            <label class="block text-slate-400 mb-1">Gemini API Key</label>
+            <input 
+              type="password" 
+              id="setting-gemini-key" 
+              placeholder="Boş bırakılırsa doğrulanmış canlı veri korpusu kullanılır" 
+              class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-purple-500 font-mono"
+            />
+          </div>
+        </div>
+
+        <!-- Cron Auto Scheduler -->
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-amber-400 block text-[11px] uppercase tracking-wider">Otomatik Zamanlayıcı (Cron Scheduler)</span>
+            <input type="checkbox" id="setting-cron-enabled" class="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0" />
+          </div>
+          
+          <div>
+            <label class="block text-slate-400 mb-1">Cron İfadesi (Varsayılan: Gece 00:00)</label>
+            <input 
+              type="text" 
+              id="setting-cron-schedule" 
+              value="0 0 * * *" 
+              class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 font-mono focus:outline-none focus:border-amber-500"
+            />
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="save-settings-btn"
+          class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition"
+        >
+          Değişiklikleri Kaydet
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Application Scripts -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
